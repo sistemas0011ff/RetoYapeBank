@@ -111,28 +111,34 @@ Para clonar el repositorio y ejecutar el proyecto, sigue estos pasos:
 
 ```bash
 # Clonar el repositorio
-git clone https://github.com/yaperos/app-nodejs-codechallenge.git
+git clone https://github.com/sistemas0011ff/RetoTecnicoYape.git
 
 # Cambiar al directorio del proyecto
 cd carpeta_del_proycto
 
 # Construir y ejecutar los servicios con Docker Compose
 docker-compose up --build
+```
 
-# Documentación de la API de Procesamiento de Transacciones Financieras
+### Endpoint de GraphQL
+
+Para interactuar con la API GraphQL, utiliza la siguiente URL en tu entorno de desarrollo local:
+[https://localhost:8080/graphql](http://localhost:8080/graphql)
+Este endpoint es el punto de entrada para todas las consultas y mutaciones GraphQL definidas en el sistema.
+
+### Documentación de la API de Procesamiento de Transacciones Financieras
 
 Esta documentación describe los puntos de entrada y las estructuras de datos utilizadas en la API GraphQL para el sistema de procesamiento de transacciones financieras.
 
-
-# Configuración de Kafka en el Sistema de Procesamiento de Transacciones
+#### Configuración de Kafka en el Sistema de Procesamiento de Transacciones
 
 Esta sección documenta específicamente la configuración de Kafka en el sistema, incluyendo la configuración de los brokers (seguidores) y los topics, así como las réplicas y particiones.
 
-## Brokers de Kafka
+##### Brokers de Kafka
 
 Se han configurado tres brokers de Kafka para garantizar la alta disponibilidad y el balanceo de carga. La configuración de cada broker es la siguiente:
 
-### Kafka1
+###### Kafka1
 
 - **Broker ID**: 1
 - **Puerto**: 9092
@@ -140,37 +146,37 @@ Se han configurado tres brokers de Kafka para garantizar la alta disponibilidad 
 - **Listeners**: PLAINTEXT://kafka1:19092, PLAINTEXT_HOST://localhost:9092
 - **Offsets Topic Replication Factor**: 1
 
-### Kafka2
+###### Kafka2
 
 - **Broker ID**: 2
 - **Puerto**: 9093
 - **Zookeeper Connect**: zookeeper:2181
 - **Listeners**: PLAINTEXT://kafka2:19093
 
-### Kafka3
+###### Kafka3
 
 - **Broker ID**: 3
 - **Puerto**: 9094
 - **Zookeeper Connect**: zookeeper:2181
 - **Listeners**: PLAINTEXT://kafka3:19094
 
-## Configuración de Topics
+##### Configuración de Topics
 
 Se han creado dos topics principales con configuraciones específicas para la replicación y particiones:
 
-### Topic: transactions_created
+###### Topic: transactions_created
 
 - **Replication Factor**: 3
 - **Partitions**: 3
 - **Descripción**: Este topic se utiliza para eventos de transacciones recién creadas.
 
-### Topic: transaction_status_updated
+###### Topic: transaction_status_updated
 
 - **Replication Factor**: 3
 - **Partitions**: 3
 - **Descripción**: Este topic se utiliza para eventos de actualización de estado de transacciones.
 
-## Consideraciones de Diseño
+##### Consideraciones de Diseño
 
 - **Alta Disponibilidad**: Con tres brokers, Kafka asegura una alta disponibilidad. En caso de fallo de un broker, los otros pueden continuar manejando los mensajes.
 - **Replicación y Particiones**: La configuración de réplicas y particiones se ha diseñado para ofrecer resistencia a fallos y un alto rendimiento en el procesamiento de mensajes.
@@ -179,9 +185,9 @@ Se han creado dos topics principales con configuraciones específicas para la re
 Esta configuración de Kafka está diseñada para manejar eficientemente el alto volumen de mensajes en el sistema de procesamiento de transacciones, garantizando la fiabilidad y la eficiencia en la entrega y procesamiento de mensajes.
 
 
-## Resolvers
+### Resolvers
 
-### `InitiateTransactionResolvers`
+#### `InitiateTransactionResolvers`
 
 Esta clase contiene los métodos para iniciar y consultar transacciones.
 
@@ -203,9 +209,9 @@ Esta clase contiene los métodos para iniciar y consultar transacciones.
   - **Descripción**: Obtiene todas las transacciones.
   - **Retorna**: Array de `TransactionResDto` - Lista de todas las transacciones.
 
-## Data Transfer Objects (DTOs)
+#### Data Transfer Objects (DTOs)
 
-### `TransactionInputDto`
+#### `TransactionInputDto`
 
 DTO para crear una nueva transacción.
 
@@ -215,7 +221,7 @@ DTO para crear una nueva transacción.
   - `transferTypeId` (Int): ID del tipo de transferencia.
   - `value` (Int): Valor de la transacción.
 
-### `TransactionResDto`
+#### `TransactionResDto`
 
 DTO para la respuesta de la creación de una transacción.
 
@@ -228,22 +234,15 @@ DTO para la respuesta de la creación de una transacción.
   - `status` (String): Estado de la transacción.
   - `createdAt` (Date): Marca de tiempo de creación de la transacción.
 
-## Excepciones y Errores
-
-La API maneja diferentes tipos de errores y excepciones, incluyendo `NotFoundError` y `BadRequestError`, proporcionando mensajes claros y específicos para facilitar la depuración y el manejo de errores.
-
----
-
-Esta documentación proporciona una visión general clara de cómo interactuar con la API de transacciones financieras, facilitando a los desarrolladores el uso y la integración en sus propias aplicaciones o servicios.
 
 
-## Uso
+### Uso
 
 El sistema permite realizar diferentes tipos de transacciones financieras. A continuación se describen algunos ejemplos de cómo usar el API para realizar transacciones y consultarlas.
 
-### Realizar Transacciones
+#### Realizar Transacciones
 
-#### Transacción con Valor Mayor a 1000 (debería ser rechazada)
+###### Transacción con Valor Mayor a 1000 (debería ser rechazada)
 ```json
 {
   "transactionInputDto": {
@@ -253,9 +252,9 @@ El sistema permite realizar diferentes tipos de transacciones financieras. A con
     "value": 1500000
   }
 }
-
-Transacción con Valor Menor a 1000 (puede ser aprobada)
-
+```
+###### Transacción con Valor Menor a 1000 (puede ser aprobada)
+```json
 {
   "transactionInputDto": {
     "accountExternalIdCredit": "GUID-CREDIT-789",
@@ -264,17 +263,9 @@ Transacción con Valor Menor a 1000 (puede ser aprobada)
     "value": 500
   }
 }
-
-Tipos de Transferencia:
-
-Transferencia Interna o Externa (transferTypeId: 1): Transferencia de fondos dentro de la misma entidad bancaria (interna) o hacia otra entidad (externa).
-Pago de Facturas (transferTypeId: 2): Pago de servicios o facturas.
-Transferencia Internacional (transferTypeId: 3): Transacciones que involucran el envío de dinero a través de fronteras internacionales.
-Recarga de Celular (transferTypeId: 4): Transacciones que involucren la recarga de crédito en teléfonos móviles.
-Transferencia Urgente (transferTypeId: 5): Transacciones que requieren procesamiento rápido o inmediato.
-Inversión o Depósito a Plazo (transferTypeId: 6): Transacciones relacionadas con inversiones o depósitos a plazo fijo.
-
-## Respuesta al Crear una Transacción
+```
+###### Respuesta al Crear una Transacción
+```json
 {
   "data": {
     "create": {
@@ -285,8 +276,18 @@ Inversión o Depósito a Plazo (transferTypeId: 6): Transacciones relacionadas c
     }
   }
 }
+```
+###### Tipos de Transferencia:
+- **transferTypeId: 1,** Transferencia de fondos dentro de la misma entidad bancaria (interna) o hacia otra entidad (externa).
+- **transferTypeId: 2,** Pago de servicios o facturas.
+- **transferTypeId: 3,** Transferencia Internacional.
+- **transferTypeId: 4,** Recarga de Celular.
+- **transferTypeId: 5,** Transacciones que requieren procesamiento rápido o inmediato.
+- **transferTypeId: 6,** Inversión o Depósito a Plazo.
 
-## Consultar Transacciones
+
+##### Consultar todas las Transacciones
+```graphql
 query Query {
   getAllTransactions {
     transactionId
@@ -298,8 +299,9 @@ query Query {
     createdAt
   }
 }
-
-## Consultar Transacciones por Id
+```
+##### Consultar Transacciones por Id
+```graphql
 query Query($getByIdId: Float!) {
   getById(id: $getByIdId) {
     transactionId
@@ -311,32 +313,16 @@ query Query($getByIdId: Float!) {
     createdAt
   }
 }
-
-## Desarrollo
-
-Detalles sobre cómo trabajar en el proyecto, incluyendo:
-- Estructura del directorio.
-- Cómo ejecutar las pruebas.
-- Normas de estilo de código.
-- Proceso para enviar pull requests.
-
-## Construido con
+```
+### Construido con
 **Tecnologías**:  
 - [Node.js](https://nodejs.org/): Un entorno de ejecución para JavaScript en el lado del servidor, clave para desarrollar aplicaciones web escalables. Se utiliza para construir la lógica del servidor, manejar solicitudes y respuestas HTTP, y se integra bien con GraphQL, Prisma y Kafka.
 - [GraphQL](https://graphql.org/): Utilizado para una API flexible y eficiente que permite a los clientes especificar exactamente los datos que necesitan.
 - [Prisma](https://www.prisma.io/): Empleado como ORM para facilitar las interacciones con la base de datos de manera segura y declarativa.
 - [Kafka](https://kafka.apache.org/): Clave para la implementación de Event Sourcing y para manejar la mensajería asíncrona entre servicios, asegurando un flujo de datos eficiente y confiable.
 
-## Contribución
-Por favor, lee `CONTRIBUTING.md` para obtener detalles sobre nuestro código de conducta y el proceso para enviarnos pull requests.
-
-
-
-## Autor
+### Autor
 
 - **Arturo Eduardo Fajardo Gutiérrez** - *Reto Técnico* - [sistemas0011ff
 ](https://github.com/yaperos/app-nodejs-codechallenge)
-
-Ver también la lista de [contribuyentes](https://github.com/tu_usuario/tu_proyecto/contributors) que participaron en este proyecto.
-
 
